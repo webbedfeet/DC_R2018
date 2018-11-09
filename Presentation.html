@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Activity Monitoring with Sensors and R</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Abhijit Dasgupta" />
+    <link href="Presentation_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <script src="Presentation_files/htmlwidgets-1.3/htmlwidgets.js"></script>
+    <script src="Presentation_files/jquery-1.12.4/jquery.min.js"></script>
+    <link href="Presentation_files/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+    <script src="Presentation_files/leaflet-1.3.1/leaflet.js"></script>
+    <link href="Presentation_files/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
+    <script src="Presentation_files/Proj4Leaflet-1.0.1/proj4-compressed.js"></script>
+    <script src="Presentation_files/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+    <link href="Presentation_files/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+    <script src="Presentation_files/leaflet-binding-2.0.2/leaflet.js"></script>
+    <link href="Presentation_files/leaflet-easybutton-1.3.1/easy-button.css" rel="stylesheet" />
+    <script src="Presentation_files/leaflet-easybutton-1.3.1/easy-button.js"></script>
+    <script src="Presentation_files/leaflet-easybutton-1.3.1/EasyButton-binding.js"></script>
+    <link href="Presentation_files/leaflet-locationfilter2-0.1.1/locationfilter.css" rel="stylesheet" />
+    <script src="Presentation_files/leaflet-locationfilter2-0.1.1/locationfilter.js"></script>
+    <script src="Presentation_files/leaflet-locationfilter2-0.1.1/locationfilter-bindings.js"></script>
+    <link href="Presentation_files/ionicons-2.0.1/ionicons.min.css" rel="stylesheet" />
+    <link href="Presentation_files/crosstalk-1.0.1/css/crosstalk.css" rel="stylesheet" />
+    <script src="Presentation_files/crosstalk-1.0.1/js/crosstalk.min.js"></script>
+    <script src="Presentation_files/d3-3.5.9/d3.min.js"></script>
+    <link href="Presentation_files/d3scatter-0.0.0/d3scatter.css" rel="stylesheet" />
+    <script src="Presentation_files/d3scatter-0.0.0/d3scatter.js"></script>
+    <script src="Presentation_files/d3scatter-binding-0.1.0/d3scatter.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="Presentation_files/bootstrap-3.3.2/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="Presentation_files/bootstrap-3.3.2/js/bootstrap.min.js"></script>
+    <link href="Presentation_files/ionrangeslider-2.1.2/css/ion.rangeSlider.css" rel="stylesheet" />
+    <link href="Presentation_files/ionrangeslider-2.1.2/css/ion.rangeSlider.skinShiny.css" rel="stylesheet" />
+    <script src="Presentation_files/ionrangeslider-2.1.2/js/ion.rangeSlider.min.js"></script>
+    <script src="Presentation_files/strftime-0.9.2/strftime-min.js"></script>
+    <link rel="stylesheet" href="css/robot.css" type="text/css" />
+    <link rel="stylesheet" href="css/robot-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Activity Monitoring with Sensors and R
+### Abhijit Dasgupta
+
+---
+
+
+layout: true
+
+&lt;div class="my-footer"&gt;
+&lt;span&gt;DC R Conference, 2018&lt;/span&gt;&lt;/div&gt;
+---
+
+
+
+## About me
+
+.pull-left[
+
++ Did genomics for 10 years
++ Consultant at NIH/NIAMS on rheumatology outcomes research
++ Co-founded Zansors, a healthcare technology and analytics startup
++ Reviewer/DSMB member for SBIR/trials in neurobiology/mental health
++ Teach _Practical R_ at NIH FAES Graduate School
++ Interests in statistical machine learning, data visualization, teaching
+]
+
+--
+
+.pull-right[
++ One of the original members and co-organizer of Statistical Programming DC
++ Former Board Member of Data Community DC
++ Managed to co-author a book!!
+&lt;img src="graphs/cookbook.jpg" style="height:180px;"&gt;&lt;/img&gt;
+]
+
+---
+
+## About me
+
+&lt;img src="graphs/family.jpg" width="100%"&gt;&lt;/img&gt;
+
+---
+
+.pull-left[
+
+### Kokikai Aikido
+
++ My 2nd longest relationship (25+ years)
++ The reason I maintain some sanity
++ 4th degree black belt
++ Come visit my class in New Market, MD
+
+]
+
+--
+
+.pull-right[
+&lt;video width="700" height="500" autoplay loop&gt;
+&lt;source src="http://www.aikidorochester.com/videos/bgvid.mp4" type="video/mp4"&gt;&lt;/video&gt;
+
+PS: My teacher, standing in the back, is 80 years old and still **kicks butt**
+]
+
+---
+class:inverse,,middle
+
+.pull-left[
+&lt;img src="graphs/zansors_logo.jpg" height="400" width="400"&gt;&lt;/img&gt;
+]
+.pull-right[
++ Personal health technology and analytics
++ Sleep apnea screening
++ Leveraging technology into activity monitoring for athletes and yogis
+
+.right[&lt;img src="graphs/respa.jpg" width=150 height=150&gt;&lt;/img&gt;]
+
+]
+
+---
+## An example run
+
+
+
+---
+
+## Linking location and heart rate
+
+
+
+---
+
+## Linking location and heart rate and respiration
+
+
+
+---
+
+## Linking location, heart rate, respiration, elevation
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightLanguage": "R",
+"countIncrementalSlides": false,
+"highlightStyle": "zenburn",
+"highlightLines": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
