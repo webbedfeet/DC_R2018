@@ -434,4 +434,6 @@ class: middle, center
 
 [http://webbedfeet.netlify.com](http://webbedfeet.netlify.com)
 
+This presentation is at [https://webbedfeet.github.io/DC_R2018/Presentation.html](https://webbedfeet.github.io/DC_R2018/Presentation.html)
+
 
