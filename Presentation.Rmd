@@ -19,8 +19,9 @@ layout: true
 <span>DC R Conference, 2018</span></div>
 ---
 
+
 ```{r setup, include=FALSE, cache=TRUE}
-knitr::opts_chunk$set(echo=F)
+knitr::opts_chunk$set(echo=F, warning=F, message=F)
 # devtools::install_github('webbedfeet/ProjTemplate')
 # List of packages to be loaded are in lib/pkgs.yml
 # Custom functions stored in lib/R
@@ -100,41 +101,266 @@ class:inverse,,middle
 ]
 
 ---
+
+## Activity data
+
++ GPS data from Garmin Forerunner
+    - with heart rate chest strap
+--
+
++ GPX format
+    - GPS Exchange format
+    - There are packages to read this
+        - `plotKML::readGPX`
+        - `maptools::readGPS`
+    - Turns out this is just an XML file
+    - I went baremetal
+    
+---
+
+## Activity data
+
+```{r, echo=T, eval=F}
+read_gpx <- function(fname){
+  require(XML)
+  require(tibble)
+  require(lubridate)
+  pfile <- htmlTreeParse(fname,
+                         error = function (...) {}, useInternalNodes = T)
+  # Get all elevations, times and coordinates via the respective xpath
+  elevations <- as.numeric(xpathSApply(pfile, path = "//trkpt/ele", xmlValue))
+  times <- as_datetime(as.character(xpathSApply(pfile, path = "//trkpt/time", xmlValue)))
+  coords <- xpathSApply(pfile, path = "//trkpt", xmlAttrs)
+  # Extract latitude and longitude from the coordinates
+  lats <- as.numeric(coords["lat",])
+  lons <- as.numeric(coords["lon",])
+  # Put everything in a dataframe and get rid of old variables
+  geodf <- data.frame(Latitude = lats, Longitude = lons, Elevation = elevations, Time = times)
+  hrs <- as.numeric(xpathSApply(pfile, path = '//trkpt/extensions/trackpointextension/hr', xmlValue))
+  if(length(hrs) > 0){
+    geodf$HR = hrs
+  }
+  geodf <- as.tibble(geodf)
+  return(geodf)
+}
+
+```
+
+
+---
+
+## Activity data
+
+```{r, echo=T, eval=F}
+read_gpx <- function(fname){
+  require(XML)
+  require(tibble)
+  require(lubridate)
+  pfile <- htmlTreeParse(fname,
+                         error = function (...) {}, useInternalNodes = T)
+  # Get all elevations, times and coordinates via the respective xpath
+  elevations <- as.numeric(xpathSApply(pfile, path = "//trkpt/ele", xmlValue)) #<<
+  times <- as_datetime(as.character(xpathSApply(pfile, path = "//trkpt/time", xmlValue))) #<<
+  coords <- xpathSApply(pfile, path = "//trkpt", xmlAttrs) #<<
+  # Extract latitude and longitude from the coordinates
+  lats <- as.numeric(coords["lat",])
+  lons <- as.numeric(coords["lon",])
+  # Put everything in a dataframe and get rid of old variables
+  geodf <- data.frame(Latitude = lats, Longitude = lons, Elevation = elevations, Time = times)
+  hrs <- as.numeric(xpathSApply(pfile, path = '//trkpt/extensions/trackpointextension/hr', xmlValue)) #<<
+  if(length(hrs) > 0){
+    geodf$HR = hrs
+  }
+  geodf <- as.tibble(geodf)
+  return(geodf)
+}
+
+```
+
+
+---
+
+## Respa by Zansors
+
+<img src="graphs/running.jpg" width="40%"></img>
+
++ Detecting breathing and motion
++ We'll distill the raw signals into 
+    - Respiration rate (breaths per minute)
+    - Cadence (steps per minute)
+
+---
+
 ## An example run
 
-```{r, out.width="100%", include=F}
+```{r, out.width="100%", include=T}
 leaflet(data = gpx1) %>% addTiles() %>% 
   addCircleMarkers(~ Longitude, ~ Latitude, radius = 1, color = 'blue')
 ```
 
+
 ---
+
+class: inverse,center,middle
+
+# ggplot +
+
+---
+
+
+
+## ggmap
+
+.pull-left[
+```{r, eval=F, echo=T}
+library(ggmap)
+register_google(key = readLines(file.path(find_dropbox(),'mapapi.txt'))[1])
+p <- ggmap(get_map(c(mean(gpx1$Longitude),mean(gpx1$Latitude)), zoom=13,
+                   maptype='roadmap'))
+
+p + geom_point(aes(Longitude, Latitude), data = gpx1, color='blue') + 
+  theme(axis.title = element_blank())
+```
+]
+.pull-right[
+```{r, eval=T, message=F}
+library(ggmap)
+register_google(key = readLines(file.path(find_dropbox(),'mapapi.txt'))[1])
+p <- ggmap(get_map(c(mean(gpx1$Longitude),mean(gpx1$Latitude)), zoom=13,
+                   maptype='roadmap'))
+
+p + geom_point(aes(Longitude, Latitude), data = gpx1, color='blue') + 
+  theme(axis.title = element_blank())
+```
+]
+
+---
+
+
+
+## ggmap
+
+.pull-left[
+```{r, eval=F, echo=T}
+library(ggmap)
+register_google(key = readLines(file.path(find_dropbox(),'mapapi.txt'))[1]) #<<
+p <- ggmap(get_map(c(mean(gpx1$Longitude),mean(gpx1$Latitude)), zoom=13,
+                   maptype='roadmap'))
+
+p + geom_point(aes(Longitude, Latitude), data = gpx1, color='blue') + 
+  theme(axis.title = element_blank())
+```
+]
+.pull-right[
+```{r, eval=T, message=F}
+library(ggmap)
+register_google(key = readLines(file.path(find_dropbox(),'mapapi.txt'))[1])
+p <- ggmap(get_map(c(mean(gpx1$Longitude),mean(gpx1$Latitude)), zoom=13,
+                   maptype='roadmap'))
+
+p <- p + geom_point(aes(Longitude, Latitude), data = gpx1, color='blue') + 
+  theme(axis.title = element_blank())
+p
+```
+]
+
+---
+
+
+## cowplot
+
+.pull-left[
+```{r, message = F, warning = F, out.height="80%"} 
+library(cowplot)
+p1 <- ggplot(gpx1, aes(Minutes, Elevation)) + geom_line()
+p2 <- ggplot(gpx1, aes(Minutes, HR))+geom_line()
+p3 <- ggplot(gpx1, aes(Minutes, Respiration))+geom_line()
+
+p
+```
+]
+.pull-right[
+```{r}
+p2
+```
+
+]
+
+---
+
 
 ## Linking location and heart rate
 
-```{r, include=F}
+```{r, include=T, eval=F, echo=T}
 shared_gpx1 <- SharedData$new(gpx1)
 bscols(
   leaflet(data = shared_gpx1, width="100%", height=450) %>% addTiles() %>% 
     addCircleMarkers(~Longitude, ~Latitude, radius=1, color='blue'),
+  list(
   d3scatter(shared_gpx1, ~Minutes, ~ HR, width="100%", height=450)
+  )
 )
 bscols(
   filter_slider("Minutes","Time", shared_gpx1, ~Minutes, width="100%")
 )
 ```
 
+.center[`leaflet` + `d3scatter` + `crosstalk`]
+
 ---
+
+
+## Linking location and heart rate
+
+```{r, include=T, eval=F, echo=T}
+shared_gpx1 <- SharedData$new(gpx1)
+bscols(
+  leaflet(data = shared_gpx1, width="100%", height=450) %>% addTiles() %>% 
+    addCircleMarkers(~Longitude, ~Latitude, radius=1, color='blue'),
+  list(
+  d3scatter(shared_gpx1, ~Minutes, ~ HR, width="100%", height=450)
+  )
+)
+{{bscols(
+  filter_slider("Minutes","Time", shared_gpx1, ~Minutes, width="100%")
+)}}
+```
+
+.center[`leaflet` + `d3scatter` + `crosstalk`]
+
+---
+
+
+## Linking location and heart rate 
+
+```{r, include=T}
+shared_gpx1 <- SharedData$new(gpx1)
+bscols(
+  leaflet(data = shared_gpx1, width="100%", height=450) %>% addTiles() %>% 
+    addCircleMarkers(~Longitude, ~Latitude, radius=1, color='blue'),
+  list(
+  d3scatter(shared_gpx1, ~Minutes, ~ HR, width="100%", height=450)
+  )
+)
+bscols(
+  filter_slider("Minutes","Time", shared_gpx1, ~Minutes, width="100%")
+)
+```
+
+
+---
+
 
 ## Linking location and heart rate and respiration
 
-```{r, include=F}
+```{r, echo=T, eval=F}
 shared_gpx1 <- SharedData$new(gpx1)
 bscols(
   leaflet(data = shared_gpx1, width="100%", height=450) %>% addTiles() %>% 
     addCircleMarkers(~Longitude, ~Latitude, radius=1, color='blue'),
   list(
   d3scatter(shared_gpx1, ~Minutes, ~ HR, width="100%", height=225),
-  d3scatter(shared_gpx1, ~Minutes, ~ Respiration, width="100%",height=225 )
+  d3scatter(shared_gpx1, ~Minutes, ~ Respiration, width="100%", height=225) #<<
   )
 )
 bscols(
@@ -142,22 +368,64 @@ bscols(
 )
 ```
 
+
 ---
 
-## Linking location, heart rate, respiration, elevation
 
-```{r, include=F}
+## Linking location and heart rate and respiration
+
+```{r, echo=F, eval=T}
 shared_gpx1 <- SharedData$new(gpx1)
 bscols(
   leaflet(data = shared_gpx1, width="100%", height=450) %>% addTiles() %>% 
     addCircleMarkers(~Longitude, ~Latitude, radius=1, color='blue'),
   list(
-  d3scatter(shared_gpx1, ~Minutes, ~ HR, width="100%", height=150),
-  d3scatter(shared_gpx1, ~Minutes, ~ Respiration, width="100%",height=150 ),
-  d3scatter(shared_gpx1, ~Minutes, ~ Elevation, width="100%",height=150 )
+  d3scatter(shared_gpx1, ~Minutes, ~ HR, width="100%", height=225),
+  d3scatter(shared_gpx1, ~Minutes, ~ Respiration, width="100%", height=225) #<<
   )
 )
 bscols(
   filter_slider("Minutes","Time", shared_gpx1, ~Minutes, width="100%")
 )
 ```
+
+
+---
+
+
+# Next steps
+
+### Create a dashboard using `flexdashboard`
+
+### Create a Shiny app
+
+### Have some fun ....
+
+---
+class: inverse, center, middle
+
+# gganimate 
+
+---
+
+
+```{r, echo=T, eval=F}
+library(gganimate)
+p + transition_reveal(gpx1$Minutes, gpx1$Minutes)
+p2 + transition_reveal(gpx1$Minutes, gpx1$Minutes)
+```
+.pull-left[
+<img src="graphs/Map.gif" width="100%"></img>
+]
+.pull-right[
+<img src = "graphs/HR.gif" width="100%"></img>
+]
+
+---
+class: middle, center
+
+# Thank you
+
+[http://webbedfeet.netlify.com](http://webbedfeet.netlify.com)
+
+
