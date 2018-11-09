@@ -86,6 +86,12 @@ PS: My teacher, standing in the back, is 80 years old and still **kicks butt**
 ]
 
 ---
+class: inverse, middle, center
+
+# Trip down memory lane
+
+
+---
 class:inverse,,middle
 
 .pull-left[
