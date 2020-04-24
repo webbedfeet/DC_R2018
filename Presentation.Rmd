@@ -281,6 +281,7 @@ library(cowplot)
 p1 <- ggplot(gpx1, aes(Minutes, Elevation)) + geom_line()
 p2 <- ggplot(gpx1, aes(Minutes, HR))+geom_line()
 p3 <- ggplot(gpx1, aes(Minutes, Respiration))+geom_line()
+p4 <- ggplot(gpx1, aes(Minutes, Cadence))+geom_line()
 
 p
 ```

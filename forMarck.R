@@ -2,10 +2,12 @@
 #' title: "Linking maps and time series"
 #' author: "Abhijit Dasgupta"
 #' date: "`r format(Sys.Date(), '%B %d, %Y')`"
-#' output_format:
+#' output:
 #'   html_document:
 #'     toc: true
 #'     toc_float: true
+#'     theme: cerulean
+#'     highlight: espresso
 #' ---
 #'
 #+ preamble, include=F
@@ -82,5 +84,5 @@ crosstalk::bscols(
   crosstalk::filter_slider("Minutes","Time", shared_gpx1, ~Minutes, width="100%")
 )
 
-#' Further reading
+#' # Further reading
 #' [Using Crosstalk](https://rstudio.github.io/crosstalk/using.html)
